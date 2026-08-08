@@ -1,0 +1,37 @@
+services:
+  web:
+    build: .
+    container_name: web
+    volumes:
+      - ./:/var/www/html
+      - "/var/www/html/vendor" #Не перезаписывать папку vendor
+      - vscode-server:/root/.vscode-server
+    ports:
+      - "80:80"
+    restart: unless-stopped
+    links:
+      - db
+    networks:
+      - on_net
+  db:
+    image: mysql
+    container_name: db
+    restart: always
+    expose:
+      - 3306
+    environment:
+      MYSQL_ROOT_PASSWORD: adminpwd
+      MYSQL_DATABASE: casemgr
+      MYSQL_USER: webadmin
+      MYSQL_PASSWORD: letmein
+    volumes:
+      - my-volume:/var/lib/mysql
+    networks:
+      - on_net
+
+volumes:
+  my-volume:
+  vscode-server:
+
+networks:
+  on_net:
