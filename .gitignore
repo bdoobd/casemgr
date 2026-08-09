@@ -1,0 +1,7 @@
+vendor/
+logs/
+
+.env
+
+.DS_*
+._.DS*
