@@ -4,9 +4,9 @@ namespace App\Models;
 
 class User {
     public int $id = 0;
-    public string $uername = '';
+    public string $username = '';
     public string $password_hash = '';
-    public datetime $created;
+    public string $created;
     public datetime $modified;
     public int $role_id = 0;
 
