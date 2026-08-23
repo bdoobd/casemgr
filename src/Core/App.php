@@ -16,9 +16,8 @@ class App
     public function run()
     {
         $uri = $_SERVER['REQUEST_URI'];
-        // $uri = rtrim($_SERVER['QUERY_STRING'], '\/');
-        // $uri = $_SERVER['QUERY_STRING'];
 
-        $this->router->dispatch($uri);
+        $output = $this->router->dispatch($uri);
+        $output->send();
     }
 }

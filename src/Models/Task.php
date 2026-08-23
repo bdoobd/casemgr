@@ -1,8 +1,11 @@
-<?php  
+<?php
 
 namespace App\Models;
 
-class Case {
+use DateTimeImmutable;
+
+class Task
+{
     public int $id = 0;
     public int $case_id = 0;
     public string $client = '';
@@ -11,8 +14,8 @@ class Case {
     public int $method_id = 0;
     public int $term_id = 0;
     public int $destination_id = 0;
-    public datetime $start_date;
-    public datetime $departire_date;
+    public DateTimeImmutable $start_date;
+    public ?DateTimeImmutable $departire_date;
     public int $cargo_id = 0;
     public int $transport_id = 0;
     public int $document_id = 0;
@@ -23,7 +26,8 @@ class Case {
     public int $user_id = 0;
     public int $status_id = 0;
 
-    public static function table_name(): string {
+    public static function table_name(): string
+    {
         return 'cases';
     }
 }

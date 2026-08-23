@@ -2,7 +2,9 @@
 
 namespace App\Core;
 
-// use App\Controllers\Home;
+use App\Core\Helper;
+use App\Core\Response;
+use Exception;
 // use App\Controllers\About;
 
 class Router
@@ -23,9 +25,9 @@ class Router
      */
     public function add(string $url, array $params = []): void
     {
-        $url = preg_replace('#\/#', '\/', $url);
-        $url = preg_replace('#\{([a-z-]+)\}#', '(?P<\1>[a-z-]+)', $url);
-        $url = preg_replace('#\{([a-z]+):([^\}]+)\}#', '(?P<\1>\2)', $url);
+        $url = preg_replace('#\{([a-z]+):([^}]+)\}#', '(?P<$1>$2)', $url);
+        $url = preg_replace('#\{([a-z-]+)\}#', '(?P<$1>[a-z-]+)', $url);
+        $url = preg_replace('#/#', '\/', $url);
         $url = '#^' . $url . '$#';
 
         $this->routes[$url] = $params;
@@ -40,26 +42,31 @@ class Router
      */
     public function match(string $url): bool
     {
-        $url = ltrim($url, '\/');
+
+        $url = trim(parse_url($url, PHP_URL_PATH), '/');
+
+        $url = $url == '' ? '/' : '/' . $url;
 
         foreach ($this->routes as $route => $param) {
 
             if (preg_match($route, $url, $matches)) {
                 foreach ($matches as $key => $match) {
+
                     if (is_string($key)) {
                         $param[$key] = $match;
                     }
                 }
 
-                
-                $this->route = $param;
-                
-                return True;
+                if (!isset($param['namespace'])) {
+                    $param['namespace'] = 'App\\Controllers';
+                } else {
+                    $param['namespace'] = 'App\\Controllers\\' . ucfirst($param['namespace']);
                 }
 
-                echo '<pre>';
-			    var_dump($route);
-			    echo '</pre>';
+                $this->route = $param;
+
+                return True;
+            }
         }
         return False;
     }
@@ -79,28 +86,36 @@ class Router
         return $this->route;
     }
 
-    public function dispatch($uri)
+    public function dispatch(string $url)
     {
-        $path = parse_url($uri, PHP_URL_PATH);
 
-        if ($this->match($uri)) {
-            echo '<pre>';
-            var_dump($this->getRoute());
-            echo '</pre>';
+        if (!$this->match($url)) {
+            throw new Exception("Route {$url} not found");
         }
 
-        echo '<pre>';
-        var_dump("Маршрут не найден {$path}");
-        echo '</pre>';
+        $controllerName = Helper::toStudlyCaps($this->route["controller"]);
+        $controllerClass = $this->route['namespace'] . '\\' . $controllerName;
 
-        // if (array_key_exists($path, $this->routes)) {
-        //     [$controller, $action] = $this->routes[$path];
+        if (!class_exists($controllerClass)) {
+            throw new Exception("Class {$controllerClass} not excists", 404);
+        }
 
-        //     $controllerInstance = new $controller();
-        //     echo $controllerInstance->$action();
-        // } else {
-        //     http_response_code(404);
-        //     echo "404 Not Found";
-        // }
+        $controllerObject = new $controllerClass;
+
+        $action_name = Helper::toCamelCase($this->route["action"]);
+        if (!method_exists($controllerObject, $action_name)) {
+            throw new Exception("Method {$action_name} not found in {$controllerName} controller",404);
+        }
+
+        // FIXME: Может есть смысл передать в аргументы скажем REQUEST
+        $result = call_user_func([$controllerObject, $action_name]);
+
+        // TODO: Попробовать отдать реультат как RESPOSE объект
+        if ($result instanceof Response) {
+            return $result;
+        }
+
+        return new Response($result);
+
     }
 }
