@@ -5,13 +5,19 @@ namespace App\Core;
 use App\Core\Helper;
 use App\Core\Response;
 use Exception;
-// use App\Controllers\About;
 
 class Router
 {
     protected array $routes = [];
 
     protected array $route = [];
+
+    protected Request $request;
+
+    public function __construct(Request $request)
+    {
+        $this->request = $request;
+    }
 
     /**
      * Метод добавляет шаблон маршрута с таблицу маршрутов
@@ -70,22 +76,14 @@ class Router
         }
         return False;
     }
-
     /**
-     * Метод возвращает таблицу маршрутов в виде ассоциативного массива
-     *
-     * @return array Таблица маршрутов
+     * Метод определяет класс и метод на основании маршрута и вызывает этот метод
+     * 
+     * @param string $url Строка адреса
+     * 
+     * @throws Exception
+     * @return Response
      */
-    public function getRoutes(): array
-    {
-        return $this->routes;
-    }
-
-    public function getRoute(): array
-    {
-        return $this->route;
-    }
-
     public function dispatch(string $url)
     {
 
@@ -104,18 +102,15 @@ class Router
 
         $action_name = Helper::toCamelCase($this->route["action"]);
         if (!method_exists($controllerObject, $action_name)) {
-            throw new Exception("Method {$action_name} not found in {$controllerName} controller",404);
+            throw new Exception("Method {$action_name} not found in {$controllerName} controller", 404);
         }
 
-        // FIXME: Может есть смысл передать в аргументы скажем REQUEST
-        $result = call_user_func([$controllerObject, $action_name]);
+        $result = call_user_func([$controllerObject, $action_name], $this->request);
 
-        // TODO: Попробовать отдать реультат как RESPOSE объект
         if ($result instanceof Response) {
             return $result;
         }
 
         return new Response($result);
-
     }
 }

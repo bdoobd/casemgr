@@ -5,12 +5,17 @@ namespace App\Core;
 class App
 {
     public static App $app;
+    public static string $ROOTPATH = '';
     public Router $router;
+    public Request $request;
+    public Response $response;
 
-    public function __construct()
+    public function __construct(string $path)
     {
         self::$app = $this;
-        $this->router = new Router();
+        self::$ROOTPATH = $path;
+        $this->request = new Request();
+        $this->router = new Router($this->request);
     }
 
     public function run()
