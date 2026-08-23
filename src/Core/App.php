@@ -2,6 +2,8 @@
 
 namespace App\Core;
 
+use App\Core\Request;
+
 class App
 {
     public static App $app;

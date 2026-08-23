@@ -98,7 +98,7 @@ class Router
             throw new Exception("Class {$controllerClass} not excists", 404);
         }
 
-        $controllerObject = new $controllerClass;
+        $controllerObject = new $controllerClass($this->route);
 
         $action_name = Helper::toCamelCase($this->route["action"]);
         if (!method_exists($controllerObject, $action_name)) {
