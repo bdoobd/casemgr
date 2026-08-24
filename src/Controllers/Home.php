@@ -2,10 +2,27 @@
 
 namespace App\Controllers;
 
-class Home
+use App\Core\BaseController;
+use App\Core\Request;
+use App\Core\Response;
+use App\Core\View;
+
+class Home extends BaseController
 {
-    public function index()
+    public function index(Request $request)
     {
-        return "Home Controller";
+        $view = new View($this->route);
+
+        $method = '<p>Method: ' . strtoupper($request->getMethod()) . '</p>';
+
+        $out = '';
+
+        foreach ($this->route as $key => $value) {
+            $out .= "<p>{$key} => {$value}</p>";
+        }
+
+        $markup = $view->render(['methos' => $method, '$out' => $out]);
+
+        return new Response($markup);
     }
 }

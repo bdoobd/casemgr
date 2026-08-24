@@ -20,10 +20,10 @@ services:
     expose:
       - 3306
     environment:
-      MYSQL_ROOT_PASSWORD: adminpwd
-      MYSQL_DATABASE: casemgr
-      MYSQL_USER: webadmin
-      MYSQL_PASSWORD: letmein
+      MYSQL_ROOT_PASSWORD: ${ROOT_PWD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PWD}
     volumes:
       - my-volume:/var/lib/mysql
     networks:
