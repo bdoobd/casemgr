@@ -6,6 +6,7 @@ use App\Core\BaseController;
 use App\Core\Request;
 use App\Core\Response;
 use App\Core\View;
+use App\Models\Home as ModelsHome;
 
 class Home extends BaseController
 {
@@ -16,6 +17,17 @@ class Home extends BaseController
         $method = '<p>Method: ' . strtoupper($request->getMethod()) . '</p>';
 
         $out = '';
+
+        $sql = 'SELECT * FROM home';
+        try {
+            $result = ModelsHome::query($sql);
+        } catch (\PDOException $e) {
+            throw $e;
+        }
+
+        echo '<pre>';
+        var_dump($result->fetchAll());
+        echo '</pre>';
 
         foreach ($this->route as $key => $value) {
             $out .= "<p>{$key} => {$value}</p>";

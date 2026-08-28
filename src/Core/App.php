@@ -3,6 +3,7 @@
 namespace App\Core;
 
 use App\Core\Request;
+use Dotenv\Dotenv;
 
 class App
 {
@@ -11,6 +12,7 @@ class App
     public Router $router;
     public Request $request;
     public Response $response;
+    public DBC $db;
 
     public function __construct(string $path)
     {
@@ -18,6 +20,11 @@ class App
         self::$ROOTPATH = $path;
         $this->request = new Request();
         $this->router = new Router($this->request);
+
+        $dotnev = Dotenv::createImmutable(self::$ROOTPATH);
+        $dotnev->load();
+
+        $this->db = new DBC();
     }
 
     public function run()
