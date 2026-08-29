@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
+use App\Core\DBModel;
 use DateTimeImmutable;
 
-class User
+class User extends DBModel
 {
     public int $id = 0;
     public string $username = '';
@@ -13,7 +14,7 @@ class User
     public DateTimeImmutable $modified;
     public int $role_id = 0;
 
-    public static function table_name(): string
+    public static function tableName(): string
     {
         return 'users';
     }

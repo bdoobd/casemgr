@@ -25,10 +25,6 @@ class Home extends BaseController
             throw $e;
         }
 
-        echo '<pre>';
-        var_dump($result->fetchAll());
-        echo '</pre>';
-
         foreach ($this->route as $key => $value) {
             $out .= "<p>{$key} => {$value}</p>";
         }

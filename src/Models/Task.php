@@ -26,7 +26,7 @@ class Task
     public int $user_id = 0;
     public int $status_id = 0;
 
-    public static function table_name(): string
+    public static function tableName(): string
     {
         return 'cases';
     }
