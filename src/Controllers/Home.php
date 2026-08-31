@@ -29,7 +29,7 @@ class Home extends BaseController
             $out .= "<p>{$key} => {$value}</p>";
         }
 
-        $markup = $view->render(['methos' => $method, '$out' => $out]);
+        $markup = $view->render(['method' => $method, 'result' => $result->fetchAll()]);
 
         return new Response($markup);
     }
