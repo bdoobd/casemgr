@@ -41,6 +41,44 @@ abstract class DBModel
 
         $sql = "SELECT * FROM {$table} WHERE {$clause}";
 
-        return $sql;
+        $stmt = self::prepare($sql);
+        foreach ($filter as $key => $value) {
+            $stmt->bindValue(":{$key}", $value);
+        }
+        $stmt->execute();
+
+        return $stmt->fetch();
+    }
+
+    public static function save(array $data)
+    {
+        $table = static::tableName();
+
+        $fields = '';
+        $palceholders = '';
+        foreach ($data as $key => $value) {
+            $fields .= "{$key},";
+            $palceholders .= ":{$key},";
+        }
+
+        $fields = rtrim($fields, ',');
+        $palceholders = rtrim($palceholders, ',');
+
+        $sql = "INSERT INTO {$table}({$fields}) VALUES({$palceholders})";
+
+        $stmt = self::prepare($sql);
+
+        foreach ($data as $key => $value) {
+            $stmt->bindValue(":{$key}", $value);
+        }
+        try {
+            $stmt->execute();
+        } catch (Exception $e) {
+            echo '<pre>';
+            var_dump($e);
+            echo '</pre>';
+        }
+
+        return true;
     }
 }
