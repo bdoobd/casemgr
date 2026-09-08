@@ -10,3 +10,8 @@ body {
   background-color: var(--light-color);
   color: var(--primary-color);
 }
+
+.chkSize-1 {
+  width: 1.5rem;
+  height: 1.5rem;
+}

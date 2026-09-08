@@ -21,6 +21,11 @@ class View
     public function render(array $data = []): string
     {
         $layoutFile = App::$ROOTPATH . '/src/Views/layouts/' . $this->layout . '.php';
+
+        if (!file_exists($layoutFile)) {
+            throw new \Exception("Layout file not found: $layoutFile");
+        }   
+
         $content = $this->renderContent($data);
 
         ob_start();
@@ -33,6 +38,10 @@ class View
 
     public function renderContent(array $data = []): string {
         $layoutFile = App::$ROOTPATH . '/src/Views/' . ucfirst($this->route['controller']) . '/' . $this->route['action'] . '.php';
+
+        if (!file_exists($layoutFile)) {
+            throw new \Exception("View file not found: $layoutFile");
+        }
 
         ob_start();
         extract($data);

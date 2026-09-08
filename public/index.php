@@ -21,4 +21,11 @@ $app->router->add('/admin/{controller}/{id:\d+}/{action}', ['namespace' => 'admi
 //  - admin/controller/id/action/cid (use namespace)
 $app->router->add('/admin/{controller}/{id:\d+}/{action}/{cid:\d+}', ['namespace' => 'admin']);
 
-$app->run();
+try {
+    $app->run();
+} catch (Exception $e) {
+    echo '<pre>';
+    var_dump($e->getMessage());
+    echo '</pre>';
+}
+// $app->run();

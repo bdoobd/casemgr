@@ -26,7 +26,7 @@ abstract class DBModel
         return self::query($sql)->fetchAll();
     }
 
-    public static function findOne(array $filter)
+    public static function findOne(array $filter): array|false
     {
         $table = static::tableName();
 
@@ -71,6 +71,48 @@ abstract class DBModel
         foreach ($data as $key => $value) {
             $stmt->bindValue(":{$key}", $value);
         }
+        try {
+            $stmt->execute();
+        } catch (Exception $e) {
+            echo '<pre>';
+            var_dump($e);
+            echo '</pre>';
+        }
+
+        return true;
+    }
+
+    public static function update(array $data)
+    {
+        $table = static::tableName();
+
+        $setString = '';
+        foreach ($data as $attribute => $value) {
+            if ($attribute == 'id')
+                continue;
+            $setString .= "{$attribute} = :{$attribute},";
+        }
+        $setString = rtrim($setString, ',');
+
+        // echo '<pre>';
+        // var_dump($setString);
+        // echo '</pre>';
+
+        $sql = "UPDATE {$table} SET {$setString} WHERE id = :id";
+
+        echo '<pre>';
+        var_dump($sql);
+        echo '</pre>';
+        $stmt = self::prepare($sql);
+
+        // echo '<pre>';
+        // var_dump($data);
+        // echo '</pre>';
+        // $stmt->bindValue(':id', $data['id']);
+        foreach ($data as $attribute => $value) {
+            $stmt->bindValue(":{$attribute}", $value);
+        }
+
         try {
             $stmt->execute();
         } catch (Exception $e) {

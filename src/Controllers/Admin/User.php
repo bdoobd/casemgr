@@ -6,6 +6,7 @@ use App\Core\BaseController;
 use App\Core\Request;
 use App\Core\Response;
 use App\Core\View;
+use App\Models\Role;
 use App\Models\User as ModelsUser;
 use Exception;
 
@@ -22,56 +23,93 @@ class User extends BaseController
         return new Response($markup);
     }
 
-    public function create(Request $request)
+    public function create(Request $request): Response
     {
         $view = new View($this->route);
+        $roles = new Role();
 
-        $data = [];
+        $viewData = ['roles' => $roles::findAll()];
 
         if ($request->isPost()) {
-            $data = $request->getRequestBody();
-            // TODO: Проверить наличие пользоватея с таким же именем, если уже есть, выбросить испключение
-            // echo '<pre>';
-            // var_dump($data['username']);
-            // echo '</pre>';
-            // NOTE: Нужен метод для выборки данных по какому то фильтру, в этом случае выбрать запись по имени и если такая есть, то пользователь с данным именем уже существует
+            $requestData = $request->getRequestBody();
 
-            if (ModelsUser::findOne(['username' => $data['username']])) {
+            if (ModelsUser::findOne(['username' => $requestData['username']])) {
                 throw new Exception('User name exists');
             }
 
-            // TODO: Сравнить пароль и пароль-подтверждение на совпадение, если не совпадают выбросить исключение
-            if ($data['password'] !== $data['passwordConfirm']) {
+            if ($requestData['password'] !== $requestData['passwordConfirm']) {
                 throw new Exception('Passwords does not match');
             }
 
-            // TODO: Хешировать пароль и записать в массив, скажем в поле password_hash
-            // echo '<pre>';
-            // var_dump('Processing with password hashing');
-            // echo '</pre>';
-            $password_hash = password_hash($data['password'], PASSWORD_DEFAULT);
-            // echo '<pre>';
-            // var_dump($password_hash);
-            // echo '</pre>';
+            $password_hash = password_hash($requestData['password'], PASSWORD_DEFAULT);
 
-            // TODO: Собрать записываемые данные в ассоциативный. массив ['поле БД' => 'значение']
-            $user['username'] = $data['username'];
+            $user['username'] = $requestData['username'];
             $user['password_hash'] = $password_hash;
-            $user['role'] = match ($data['role']) {
-                '1' => 'admin',
-                '2' => 'power',
-                '3' => 'user',
-            };
+            $user['role_id'] = $requestData['role_id'];
 
-            // echo '<pre>';
-            // var_dump($user);
-            // echo '</pre>';
-            // TODO: Передать массив в метод (базовый?) записи данных
             ModelsUser::save($user);
         }
 
+        $markup = $view->render($viewData);
 
-        $markup = $view->render($data);
+        return new Response($markup);
+    }
+
+    public function update(Request $request): Response
+    {
+        $view = new View($this->route);
+        $roles = new Role();
+
+        $viewData = ['roles' => $roles::findAll()];
+
+        // TODO: Полуить ID из Router
+        // TODO: Получить данные пользователя по ID
+        $found = ModelsUser::findOne(['id' => $this->route['id']]);
+
+        if (!$found) {
+            throw new Exception('User not found');
+        }
+
+        // TODO: Передать данные пользователя в View
+        $viewData['user'] = $found;
+
+        // TODO: Получить данные из формы
+        if ($request->isPost()) {
+            $requestData = $request->getRequestBody();
+
+            // TODO: Если дисаблить поля пароля и подтверждения, то надо использовать isset
+            // if (!empty($requestData['password'])) {
+            //     if (($requestData['password'] === $requestData['passwordConfirm'])) {
+            //         $requestData['password_hash'] = password_hash($requestData['password'], PASSWORD_DEFAULT);
+            //         unset($requestData['password'], $requestData['passwordConfirm']);
+            //     } else {
+            //         throw new Exception('Passwords does not match');
+            //     }
+            // } else {
+            //     unset($requestData['password'], $requestData['passwordConfirm'], $requestData['password_hash']);
+            // }
+
+            echo '<pre>';
+            var_dump($requestData);
+            echo '</pre>';
+            $updates = [];
+            foreach ($requestData as $attribute => $value) {
+                if ($attribute == 'submit')
+                    continue;
+                $updates[$attribute] = $value;
+            }
+            $viewData['formdata'] = $updates;
+
+            // echo '<pre>';
+            // var_dump($updates);
+            // echo '</pre>';
+
+
+            // TODO: Обновить данные пользователя в базе данных
+            // ModelsUser::update($updates);
+        }
+
+        $markup = $view->render($viewData);
 
         return new Response($markup);
     }

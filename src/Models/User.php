@@ -11,7 +11,7 @@ class User extends DBModel
     public string $username = '';
     public string $password_hash = '';
     public DateTimeImmutable $created;
-    public DateTimeImmutable $modified;
+    public ?DateTimeImmutable $modified;
     public int $role_id = 0;
 
     public static function tableName(): string
