@@ -6,6 +6,8 @@ use App\Core\BaseController;
 use App\Core\Request;
 use App\Core\Response;
 use App\Core\View;
+use App\DTO\CreateUserDTO;
+use App\DTO\ShowUserWithRoleDTO;
 use App\Models\Role;
 use App\Models\User as ModelsUser;
 use Exception;
@@ -16,7 +18,17 @@ class User extends BaseController
     {
         $view = new View($this->route);
 
-        $data = ModelsUser::findAll();
+        // $data = ModelsUser::findAll();
+        $users = ModelsUser::fetchAllUsersWithRile();
+        $data = array_map(fn($item) => ShowUserWithRoleDTO::fromArray($item), $users);
+
+        echo '<pre>';
+        var_dump($data);
+        echo '</pre>';
+
+        // echo '<pre>';
+        // var_dump($data);
+        // echo '</pre>';
 
         $markup = $view->render(['name' => 'Admin User index', 'data' => $data]);
 
@@ -41,11 +53,17 @@ class User extends BaseController
                 throw new Exception('Passwords does not match');
             }
 
-            $password_hash = password_hash($requestData['password'], PASSWORD_DEFAULT);
+            $user = CreateUserDTO::fromArray($requestData);
 
-            $user['username'] = $requestData['username'];
-            $user['password_hash'] = $password_hash;
-            $user['role_id'] = $requestData['role_id'];
+            echo '<pre>';
+            var_dump($user);
+            echo '</pre>';
+
+            //     $password_hash = password_hash($requestData['password'], PASSWORD_DEFAULT);
+
+            //     $user['username'] = $requestData['username'];
+            //     $user['password_hash'] = $password_hash;
+            //     $user['role_id'] = $requestData['role_id'];
 
             ModelsUser::save($user);
         }

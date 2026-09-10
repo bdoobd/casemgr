@@ -3,6 +3,7 @@
 namespace App\Core;
 
 use Exception;
+use PDO;
 use PDOStatement;
 
 abstract class DBModel
@@ -50,7 +51,7 @@ abstract class DBModel
         return $stmt->fetch();
     }
 
-    public static function save(array $data)
+    public static function save(object $data): bool
     {
         $table = static::tableName();
 
@@ -74,6 +75,7 @@ abstract class DBModel
         try {
             $stmt->execute();
         } catch (Exception $e) {
+            // TODO: Выбрость кастомное исключение для отлова на верхнем уровне
             echo '<pre>';
             var_dump($e);
             echo '</pre>';
