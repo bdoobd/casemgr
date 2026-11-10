@@ -102,9 +102,6 @@ abstract class DBModel
 
         $sql = "UPDATE {$table} SET {$setString} WHERE id = :id";
 
-        echo '<pre>';
-        var_dump($sql);
-        echo '</pre>';
         $stmt = self::prepare($sql);
 
         // echo '<pre>';
@@ -118,6 +115,7 @@ abstract class DBModel
         try {
             $stmt->execute();
         } catch (Exception $e) {
+            // TODO: Выбрость кастомное исключение для отлова на верхнем уровне
             echo '<pre>';
             var_dump($e);
             echo '</pre>';

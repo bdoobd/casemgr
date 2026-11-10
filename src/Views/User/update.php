@@ -4,11 +4,6 @@
 /** @var array $user */
 ?>
 <h2>Update user <?= ucfirst($user['username']) ?></h2>
-<?php
-// echo '<pre>';
-// var_dump($formdata);
-// echo '</pre>';
-?>
 <script defer src="/assets/js/updateUserData.js"></script>
 <div class="row">
     <div class="col">&nbsp;</div>
@@ -28,7 +23,7 @@
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div class="form-check mb-2">
+            <!-- <div class="form-check mb-2">
                 <input class="form-check-input chkSize-1 me-3" type="checkbox" value="" id="reset" name="reset">
                 <label class="form-check-label" for="reset">
                     Reset password
@@ -41,7 +36,7 @@
             <div class="mb-3">
                 <label for="passwordConfirm" class="form-label">Confirm password</label>
                 <input type="password" class="form-control" id="passwordConfirm" name="passwordConfirm" disabled>
-            </div>
+            </div> -->
             <button type="submit" class="btn btn-primary" name="submit">Submit</button>
         </form>
     </div>

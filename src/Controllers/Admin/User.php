@@ -8,6 +8,7 @@ use App\Core\Response;
 use App\Core\View;
 use App\DTO\CreateUserDTO;
 use App\DTO\ShowUserWithRoleDTO;
+use App\DTO\UpdateUserDTO;
 use App\Models\Role;
 use App\Models\User as ModelsUser;
 use Exception;
@@ -18,17 +19,8 @@ class User extends BaseController
     {
         $view = new View($this->route);
 
-        // $data = ModelsUser::findAll();
         $users = ModelsUser::fetchAllUsersWithRile();
         $data = array_map(fn($item) => ShowUserWithRoleDTO::fromArray($item), $users);
-
-        echo '<pre>';
-        var_dump($data);
-        echo '</pre>';
-
-        // echo '<pre>';
-        // var_dump($data);
-        // echo '</pre>';
 
         $markup = $view->render(['name' => 'Admin User index', 'data' => $data]);
 
@@ -55,16 +47,6 @@ class User extends BaseController
 
             $user = CreateUserDTO::fromArray($requestData);
 
-            echo '<pre>';
-            var_dump($user);
-            echo '</pre>';
-
-            //     $password_hash = password_hash($requestData['password'], PASSWORD_DEFAULT);
-
-            //     $user['username'] = $requestData['username'];
-            //     $user['password_hash'] = $password_hash;
-            //     $user['role_id'] = $requestData['role_id'];
-
             ModelsUser::save($user);
         }
 
@@ -80,55 +62,47 @@ class User extends BaseController
 
         $viewData = ['roles' => $roles::findAll()];
 
-        // TODO: Полуить ID из Router
-        // TODO: Получить данные пользователя по ID
         $found = ModelsUser::findOne(['id' => $this->route['id']]);
 
         if (!$found) {
             throw new Exception('User not found');
         }
 
-        // TODO: Передать данные пользователя в View
         $viewData['user'] = $found;
 
-        // TODO: Получить данные из формы
         if ($request->isPost()) {
             $requestData = $request->getRequestBody();
 
-            // TODO: Если дисаблить поля пароля и подтверждения, то надо использовать isset
-            // if (!empty($requestData['password'])) {
-            //     if (($requestData['password'] === $requestData['passwordConfirm'])) {
-            //         $requestData['password_hash'] = password_hash($requestData['password'], PASSWORD_DEFAULT);
-            //         unset($requestData['password'], $requestData['passwordConfirm']);
-            //     } else {
-            //         throw new Exception('Passwords does not match');
-            //     }
-            // } else {
-            //     unset($requestData['password'], $requestData['passwordConfirm'], $requestData['password_hash']);
-            // }
-
-            echo '<pre>';
-            var_dump($requestData);
-            echo '</pre>';
-            $updates = [];
-            foreach ($requestData as $attribute => $value) {
-                if ($attribute == 'submit')
-                    continue;
-                $updates[$attribute] = $value;
-            }
-            $viewData['formdata'] = $updates;
+            $update_user = UpdateUserDTO::fromArray($requestData);
 
             // echo '<pre>';
-            // var_dump($updates);
+            // var_dump((array)$update_user);
             // echo '</pre>';
 
+            $viewData['formdata'] = $update_user;
 
             // TODO: Обновить данные пользователя в базе данных
-            // ModelsUser::update($updates);
+            ModelsUser::update((array)$update_user);
         }
 
         $markup = $view->render($viewData);
 
         return new Response($markup);
+    }
+
+    public function changePassword(Request $request): Response
+    {
+        if ($request->isPost()) {
+            $requestData = $request->getRequestBody();
+
+            if (isset($requestData['password']) and ($requestData['password'] !== $requestData['passwordConfirm'])) {
+                throw new Exception('Passwords does not match');
+            }
+
+            if (($requestData['password'] === $requestData['passwordConfirm'])) {
+                $requestData['password_hash'] = password_hash($requestData['password'], PASSWORD_DEFAULT);
+            }
+        }
+        return new Response('Change password');
     }
 }
