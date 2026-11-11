@@ -51,7 +51,7 @@ abstract class DBModel
         return $stmt->fetch();
     }
 
-    public static function save(object $data): bool
+    public static function save(array $data): bool
     {
         $table = static::tableName();
 

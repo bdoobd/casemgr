@@ -2,6 +2,7 @@
 
 namespace App\Controllers\admin;
 
+use App\Core\App;
 use App\Core\BaseController;
 use App\Core\Request;
 use App\Core\Response;
@@ -47,7 +48,11 @@ class User extends BaseController
 
             $user = CreateUserDTO::fromArray($requestData);
 
-            ModelsUser::save($user);
+            if(ModelsUser::save((array)$user)) {
+                App::$app->response->redirect('/admin/user/index');
+            }
+
+            
         }
 
         $markup = $view->render($viewData);

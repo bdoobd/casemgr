@@ -19,6 +19,7 @@ class App
         self::$app = $this;
         self::$ROOTPATH = $path;
         $this->request = new Request();
+        $this->response = new Response('');
         $this->router = new Router($this->request);
 
         $dotnev = Dotenv::createImmutable(self::$ROOTPATH);
